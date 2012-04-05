@@ -41,24 +41,48 @@
 
 (function($, undefined) {
 
+    function updateDayHeader(day_column_div) {
+        var totoal_time = 0;
+        day_column_div.children().children('.time-record').each(function() {
+            totoal_time += $(this).data('record').hours;
+        });
+        day_column_div.children().children('.day-time').text('Total: ' + totoal_time);
+    }
+
+    function recordUIResized(ui) {
+        var record = ui.data('record');
+        var h = ui.height() / 60.0;
+        record.hours = h;
+        ui.children('.time').text(h);
+        updateDayHeader(ui.parent().parent());
+    }
+
     function createRecordUI(record) {
-        return $("<li class='time-record'></li>").height(record.hours * 60).text(record.comments).data('record', record).resizable({
-            grid: 15,
-            maxWidth: 200,
-            minWidth: 200,
-            resize: function(event, ui) {
-                var h = ui.element.height() / 60.0;
-                ui.element.children('.time').text(h);
-            }
-        }).disableSelection();
+        return $("<li class='time-record'></li>")
+            .height(record.hours * 60)
+            .data('record', record)
+            .resizable({
+                grid: 15,
+                maxWidth: 200,
+                minWidth: 200,
+                resize: function(event, ui) {
+                    recordUIResized(ui.element);
+                }
+            })
+            .append($("<span class='time'></span>").text(record.hours))
+            .append($("<span class='comment'></span>").text(record.comments))
+            .disableSelection();
     }
 
     function createIssueUI(issue) {
-        return $("<li class='time-record'></li>").text(issue.subject).draggable({
-            connectToSortable: '.time-record-list',
-            helper: 'clone',
-            revert: 'invalid'
-        }).disableSelection();
+        return $("<li class='time-record'></li>")
+            .text(issue.subject)
+            .draggable({
+                connectToSortable: '.time-record-list',
+                helper: 'clone',
+                revert: 'invalid'
+            })
+            .disableSelection();
     }
 
     function formatDate(date, f){
@@ -106,7 +130,7 @@
                 for (var date_str in data.records) {
                     var date = new Date(date_str);
                     var day_column_div = $("<div class='day-column'></div>");
-                    var day_column_hdr = $("<div class='day-header'>" + formatDate(date, 'dddd, mmmm dd') + "</div>");
+                    var day_column_hdr = $("<div class='day-header'>" + formatDate(date, 'dddd, mmmm dd') + "<div class='day-time'>...</div></div>");
                     var day_column_ul  = $("<ul class='time-record-list'></div>");
                     content.prepend(day_column_div.append(day_column_hdr).append(day_column_ul));
 
@@ -115,6 +139,7 @@
                         var record_li = createRecordUI(record);
                         day_column_ul.append(record_li);
                     });
+                    updateDayHeader(day_column_div);
                 }
 
                 $(".time-record-list").sortable({
@@ -133,7 +158,6 @@
                     var issue_ui = createIssueUI(issue);
                     day_column_div.append(issue_ui);
                 });
-
             }
         });
     });

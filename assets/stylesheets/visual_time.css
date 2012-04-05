@@ -34,12 +34,15 @@
 	border: solid 1px #AECCD7;
 	background-color: #EAF2F5;
 	border-radius: 3px;
-	font-size: 8pt !important;
+	font-size: 9pt !important;
 	padding: 3px;
 }
 
 .time {
 	font-weight: bold;
+	background-color: #AECCD7;
+	padding: 0 5px 0 5px;
+	margin-right: 5px;
 }
 
 .stack-column {
