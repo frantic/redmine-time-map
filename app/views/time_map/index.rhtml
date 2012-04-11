@@ -1,6 +1,7 @@
 <% content_for :header_tags do %>
-  <%= stylesheet_link_tag 'visual_time', :plugin => 'redmine_time_map' %>
+  <%= stylesheet_link_tag 'time_map', :plugin => 'redmine_time_map' %>
   <%= stylesheet_link_tag 'jquery.ui.resizable.css', :plugin => 'redmine_time_map' %>
+
   <%= javascript_include_tag 'jquery-1.7.1.js', :plugin => 'redmine_time_map' %>
   <%= javascript_include_tag 'jquery.ui.core.js', :plugin => 'redmine_time_map' %>
   <%= javascript_include_tag 'jquery.ui.widget.js', :plugin => 'redmine_time_map' %>
@@ -13,4 +14,4 @@
 
 <h2>It Works!</h2>
 
-<div id="visual_time_content"></div>
+<div id="time_map_content"></div>
