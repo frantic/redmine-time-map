@@ -1,4 +1,4 @@
-class VisualTimeController < ApplicationController
+class TimeMapController < ApplicationController
   unloadable
 
   def index

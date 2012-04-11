@@ -123,7 +123,7 @@
     $(document).ready(function() {
         var content = $("#visual_time_content").html("Loading...");
         $.ajax({
-            url: '/visual_time/records.json',
+            url: '/time_map/records.json',
             success: function(data) {
                 console.log(data);
                 content.html("");
@@ -148,7 +148,7 @@
             }
         });
         $.ajax({
-            url: '/visual_time/issues.json',
+            url: '/time_map/issues.json',
             success: function(data) {
                 console.log(data);
                 var day_column_div = $("<div class='day-column'></div>");
