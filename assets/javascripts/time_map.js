@@ -1,3 +1,83 @@
+(function ($) { $(function() {
+
+    var time_record_template = "<span class='time'><%= hours %></span><span class='comment'><%= comments %></span>";
+
+    var TimeRecord = Backbone.Model.extend({
+        /*
+        - project_name
+        - issue_id
+        - hours
+        - comments
+        */
+
+        defaults: {
+            hours: 1,
+            comments: ""
+        }
+    });
+
+    var TimeRecordList = Backbone.Collection.extend({
+        model: TimeRecord
+    });
+
+    var TimeRecordView = Backbone.View.extend({
+        tagName: "li",
+        template: _.template(time_record_template),
+        
+        initialize: function() {
+            this.model.bind('change', this.render, this);
+            this.model.bind('destroy', this.remove, this);
+        },
+
+        render: function() {
+            this.$el.html(this.template(this.model.toJSON()));
+            this.$el.addClass('time-record');
+            return this;
+        }
+    });
+
+    var TimeRecordListView = Backbone.View.extend({
+        tagName: "ul",
+
+        initialize: function() {
+            this.collection.on('add', this.addRecord, this);
+            this.collection.on('reset', this.addAllRecords, this);
+        },
+
+        addRecord: function(record) {
+            var recordView = new TimeRecordView({model: record});
+            this.$el.append(recordView.render().el);
+        },
+
+        addAllRecords: function() {
+            this.collection.each(this.addRecord, this);
+        }
+    });
+
+    var AppView = Backbone.View.extend({
+        el: $('#time_map_content'),
+
+        initialize: function() {
+            var records = new TimeRecordList;
+            console.log(records);
+            var recordListView = new TimeRecordListView({collection: records});
+            console.log(recordListView);
+            this.$el.append(recordListView.el);
+
+            records.reset([
+                {"comments": "hello"},
+                {"hours": 2.5, "comments": "something"},
+                {"hours": 4}
+            ]);
+        }
+    });
+
+    // Run the app
+    var appView = new AppView;
+
+}); })(jQuery);
+
+
 /*
 
 <div class="stack-column">
@@ -37,7 +117,7 @@
             }
         }).disableSelection();
 
-*/
+
 
 (function($, undefined) {
 
@@ -162,3 +242,4 @@
         });
     });
 })(jQuery);
+*/
