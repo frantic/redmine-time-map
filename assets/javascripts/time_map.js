@@ -1,23 +1,22 @@
 (function ($) { $(function() {
 
-    var time_record_template = "<span class='time'><%= hours %></span><span class='comment'><%= comments %></span>";
+    var time_record_template = "<span class='time'><%= hours %></span>#<%= issue_id %> \
+                                <span class='comment'><%= comments %></span>";
+    var day_column_template  = "<div class='day-header'></div><ul class='time-record-list'></ul></div>";
 
     var TimeRecord = Backbone.Model.extend({
-        /*
-        - project_name
-        - issue_id
-        - hours
-        - comments
-        */
-
         defaults: {
+            project_name: "<Project>",
+            issue_id: 0,
             hours: 1,
+            spent_on: "",
             comments: ""
         }
     });
 
     var TimeRecordList = Backbone.Collection.extend({
-        model: TimeRecord
+        model: TimeRecord,
+        url: '/time_map/records/'
     });
 
     var TimeRecordView = Backbone.View.extend({
@@ -32,21 +31,46 @@
         render: function() {
             this.$el.html(this.template(this.model.toJSON()));
             this.$el.addClass('time-record');
+            this.$el.height(this.model.get("hours") * 60);
             return this;
         }
     });
 
+
+    var DayColumnView = Backbone.View.extend({
+        tagName: "div",
+
+        render: function() {
+            this.$el.html(day_column_template).addClass('day-column');
+            return this;
+        },
+
+        addRecord: function(record) {
+            var recordView = new TimeRecordView({model: record});
+            this.$el.children("ul").append(recordView.render().el);
+        }
+    });
+
     var TimeRecordListView = Backbone.View.extend({
-        tagName: "ul",
+        tagName: "div",
 
         initialize: function() {
             this.collection.on('add', this.addRecord, this);
             this.collection.on('reset', this.addAllRecords, this);
         },
 
+        render: function() {
+            this.columns = [];
+            for(var day = 1; day <= 5; day++) {
+                var column = new DayColumnView;
+                this.$el.append(column.render().el);
+                this.columns.push(column);
+            }
+            return this;
+        },
+
         addRecord: function(record) {
-            var recordView = new TimeRecordView({model: record});
-            this.$el.append(recordView.render().el);
+            this.columns[new Date(record.get('spent_on')).getDay() - 1].addRecord(record);
         },
 
         addAllRecords: function() {
@@ -59,16 +83,10 @@
 
         initialize: function() {
             var records = new TimeRecordList;
-            console.log(records);
             var recordListView = new TimeRecordListView({collection: records});
-            console.log(recordListView);
-            this.$el.append(recordListView.el);
+            this.$el.append(recordListView.render().el);
 
-            records.reset([
-                {"comments": "hello"},
-                {"hours": 2.5, "comments": "something"},
-                {"hours": 4}
-            ]);
+            records.fetch();
         }
     });
 
